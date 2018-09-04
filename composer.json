@@ -25,9 +25,9 @@
             "providers": [
                 "LiveCMS\\DataTables\\DataTablesServiceProvider"
             ],
-            "aliases": {
-                "DataTables": "LiveCMS\\DataTables\\Facades\\DataTables"
-            }
+            "dont-discover": [
+                "yajra/laravel-datatables-oracle"
+            ]
         }
     }
 }

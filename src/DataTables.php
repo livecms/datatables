@@ -33,10 +33,10 @@ class DataTables extends YajraDataTables
     protected $captions;
 
     /**
-     * [$pattern description]
+     * [$fields description]
      * @var [type]
      */
-    protected $pattern;
+    protected $fields;
 
     /**
      * [$defaultOrder description]
@@ -44,14 +44,14 @@ class DataTables extends YajraDataTables
      */
     protected $defaultOrder;
 
-    public function __construct(HasDataTables $object, $url, array $pattern = null)
+    public function __construct(HasDataTables $object, $url, array $fields = null)
     {
         $this->object = $object;
         $this->setUrl($url);
-        $this->setPattern(
-            $pattern
-            ?? (method_exists($object, 'getDataTablesPattern')
-                ? $object->getDataTablesPattern()
+        $this->setFields(
+            $fields
+            ?? (method_exists($object, 'getDataTablesFields')
+                ? $object->getDataTablesFields()
                 : []
             )
         );
@@ -113,24 +113,24 @@ class DataTables extends YajraDataTables
     }
 
     /**
-     * [setPattern description]
-     * @param array $pattern [description]
+     * [setFields description]
+     * @param array $fields [description]
      */
-    public function setPattern(array $pattern = [])
+    public function setFields(array $fields = [])
     {
-        $this->pattern = $pattern;
+        $this->fields = $fields;
         return $this;
     }
 
     /**
-     * [getColumnsByPattern description]
+     * [getColumnsByFields description]
      * @return [type] [description]
      */
-    protected function getColumnsByPattern()
+    protected function getColumnsByFields()
     {
         $columns = [];
 
-        foreach ($this->pattern as $caption => $field) {
+        foreach ($this->fields as $caption => $field) {
             if (is_string($field)) {
                 if (is_numeric($caption)) {
                     $columns[] = new Field($field);
@@ -171,7 +171,7 @@ class DataTables extends YajraDataTables
             return $this->columns = $columns;
         }
 
-        return $this->columns = $this->getColumnsByPattern()->toArray();
+        return $this->columns = $this->getColumnsByFields()->toArray();
     }
 
     /**
@@ -263,10 +263,10 @@ class DataTables extends YajraDataTables
         return $captions;
     }
     /**
-     * [getCaptionByPattern description]
+     * [getCaptionByFields description]
      * @return [type] [description]
      */
-    protected function getCaptionByPattern($key, $field)
+    protected function getCaptionByFields($key, $field)
     {
         if (is_string($field)) {
             return (!is_numeric($key) && $key != $field) ? $field : title_case(str_replace('_', ' ', $field));
@@ -306,12 +306,14 @@ class DataTables extends YajraDataTables
 
     protected function fieldProcessing($dataTables)
     {
-        $this->getColumnsByPattern()->map(function ($item) use (&$dataTables) {
+        $this->getColumnsByFields()->map(function ($item) use (&$dataTables) {
             if ($item->resolve) {
                 $dataTables->addColumn($item->name, $item->resolve);
             }
             if ($item->display) {
-                $dataTables->editColumn($item->name, $item->display);
+                $dataTables->editColumn($item->name, function ($row) use ($item) {
+                    return call_user_func_array($item->display, [$row->{$item->name}]);
+                });
             }
         });
 
