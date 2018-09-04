@@ -1,7 +1,7 @@
 {
-    "name": "livecms/datatables",
+    "name": "mrofi/livecms-datatables",
     "description": "Live CMS Datatables",
-    "homepage": "https://github.com/livecms/datatables",
+    "homepage": "https://github.com/mrofi/livecms-datatables",
     "license": "MIT",
     "authors": [
         {
@@ -29,7 +29,5 @@
                 "DataTables": "LiveCMS\\DataTables\\Facades\\DataTables"
             }
         }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    }
 }
