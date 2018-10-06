@@ -26,6 +26,7 @@ class Field implements Arrayable
         'type',
         'visible',
         'width',
+        'row',
     ];
 
     protected $configs = [];
