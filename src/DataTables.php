@@ -262,7 +262,9 @@ class DataTables extends YajraDataTables
      */
     public function renderView($url = null)
     {
-        $this->setUrl($url);
+        if ($url) {
+            $this->setUrl($url);
+        }
         $this->setColumns();
         $this->setDefaultOrder();
 
