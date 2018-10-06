@@ -15,12 +15,6 @@ class DataTables extends YajraDataTables
     protected $object;
 
     /**
-     * [$usesTimestamps description]
-     * @var boolean
-     */
-    protected $usesTimestamps = true;
-
-    /**
      * [$columns description]
      * @var [type]
      */
@@ -44,17 +38,26 @@ class DataTables extends YajraDataTables
      */
     protected $defaultOrder;
 
-    public function __construct(HasDataTables $object, $url, array $fields = null)
+    public function __construct($instance = null, array $fields = null)
     {
-        $this->object = $object;
-        $this->setUrl($url);
+        $this->setQueryClass($instance);
         $this->setFields(
             $fields
-            ?? (method_exists($object, 'getDataTablesFields')
-                ? $object->getDataTablesFields()
+            ?? ($instance !== null && method_exists($instance, 'getDataTablesFields')
+                ? $instance->getDataTablesFields()
                 : []
             )
         );
+    }
+
+    /**
+     * [setQueryClass description]
+     * @param [type] $instance [description]
+     */
+    public function setQueryClass($instance)
+    {
+        $this->object = $instance;
+        return $this;
     }
 
     /**
@@ -93,26 +96,6 @@ class DataTables extends YajraDataTables
     }
 
     /**
-     * [useTimestamps description]
-     * @return [type] [description]
-     */
-    public function useTimestamps()
-    {
-        $this->usesTimestamps = true;
-        return $this;
-    }
-
-    /**
-     * [dontUseTimestamps description]
-     * @return [type] [description]
-     */
-    public function dontUseTimestamps()
-    {
-        $this->usesTimestamps = false;
-        return $this;
-    }
-
-    /**
      * [setFields description]
      * @param array $fields [description]
      */
@@ -145,12 +128,6 @@ class DataTables extends YajraDataTables
                 ]);
             } elseif (is_array($field)) {
                 $columns[] = new Field($caption, null, $field);
-            }
-        }
-
-        if ($this->usesTimestamps) {
-            if (!isset($columns['created_at'])) {
-                $columns[] = new Field(__('Created At'), 'created_at', ['visible' => false]);
             }
         }
 
@@ -210,11 +187,6 @@ class DataTables extends YajraDataTables
         return null;
     }
 
-    protected function getDefaultOrderColumn()
-    {
-        return $this->usesTimestamps ? 'created_at' : null;
-    }
-
     /**
      * [setDefaultOrder description]
      * @param [type] $order [description]
@@ -234,12 +206,8 @@ class DataTables extends YajraDataTables
             }
             if ($this->defaultOrder) {
                 $order = $this->defaultOrder;
-            } else if (
-                $colNumber = $this->getColumnNumber(
-                    $this->getDefaultOrderColumn()
-                )
-            ) {
-                $order = [[$colNumber, 'desc']];
+            } else {
+                $order = [[0, 'asc']];
             }
         }
 
@@ -292,8 +260,9 @@ class DataTables extends YajraDataTables
     /**
      * render datatable and share to view
      */
-    public function renderView()
+    public function renderView($url = null)
     {
+        $this->setUrl($url);
         $this->setColumns();
         $this->setDefaultOrder();
 
@@ -342,7 +311,9 @@ class DataTables extends YajraDataTables
     {
         return $this->makeDataTablesData(
             static::make(
-                $this->object->toDataTablesQuery()
+                $this->object instanceOf HasDataTables
+                    ? $this->object->toDataTablesQuery()
+                    : $this->object
             ),
             $callback
         );

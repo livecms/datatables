@@ -124,7 +124,7 @@ return [
             'searchPlaceholder' =>   'Search',
         ],
         'ajax' => [
-            'url' => '',
+            'url' => 'datatable',
             'type' => 'POST',
         ],
     ],
