@@ -315,6 +315,11 @@ class DataTables extends YajraDataTables
                     return call_user_func_array($item->display, [$row->{$item->name}]);
                 });
             }
+            foreach ($item->row ?? [] as $func => $callback) {
+                if (method_exists($dataTables, $func)) {
+                    $dataTables->$func($callback);
+                }
+            }
         });
 
         return $dataTables;
