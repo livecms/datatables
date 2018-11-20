@@ -1,7 +1,7 @@
 {
-    "name": "mrofi/livecms-datatables",
+    "name": "livecms/datatables",
     "description": "Live CMS Datatables",
-    "homepage": "https://github.com/mrofi/livecms-datatables",
+    "homepage": "https://github.com/livecms/datatables",
     "license": "MIT",
     "authors": [
         {
